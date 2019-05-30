@@ -1,0 +1,47 @@
+
+<?php $__env->startSection('title', 'Customise'); ?>
+
+<?php $__env->startSection('content'); ?>
+<?php echo $__env->make('partials.menu', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+<div class="main container" >
+	
+	<section class="content clearfix">
+		<div class="settings">
+			<form method="post" action="<?php echo URL::route('customise', array('name' => $currentblog->name)); ?>">
+				<label> Custom CSS : </label>
+				<textarea class="code-lg" name="customcss" ><?php echo json_decode($currentblog->config)->customcss; ?></textarea>
+				<div class="pull-right">
+					<button type="submit" class="blue btn"> Save Changes </a>
+				</div>
+			</form>
+		</div>
+		<aside class="sidebar">
+			<ul class="nav nav-pills nav-stacked navigation">
+				<li><a href="<?php echo URL::route('dashboard'); ?>"><i class="glyphicon glyphicon-list-alt"></i>&nbsp; Posts</a></li>
+				<li class="active"><a href="<?php echo URL::route('customise', array('name' => $currentblog->name)); ?>"><i class="glyphicon glyphicon-eye-open"></i>&nbsp; Customize</a></li>
+			</ul>
+			<div class="title">
+        Blogs
+      </div>
+      <ul class="nav nav-pills nav-stacked navigation">
+        <?php foreach($blogs as $blog): ?>
+        <li class="<?php if($currentblog->name == $blog->name): ?> <?php echo 'active'; ?> <?php endif; ?>"><a href="<?php echo URL::route('customise', array('name' => $blog->name)); ?>"> <img src="<?php echo asset(json_decode($blog->config)->picture); ?>" class="small-img" /> <?php echo json_decode($blog->config)->title; ?> </a></li>
+        <?php endforeach; ?>
+      </ul>
+		</aside>
+	</section>
+</div >
+
+<?php echo $__env->make('partials.bottom', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('page-script'); ?>
+<script >
+
+  $('.selectpicker').selectpicker();
+
+</script >
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layout', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

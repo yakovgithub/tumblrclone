@@ -1,0 +1,43 @@
+
+<?php $__env->startSection('title', 'Login'); ?>
+
+<?php $__env->startSection('content'); ?>
+
+<div class="fixed-container" style="background-image: url('<?php echo asset('assets/images/bg.jpg'); ?>');" >
+
+  <div class="form-container" >
+    <img class="logo" src="<?php echo asset("assets/images/".Config::get('database.logo')); ?>" >
+    <form method="post" action="<?php echo URL::to('login'); ?>" >
+      <div class="rounded-form" >
+        <?php if(Session::get('error')): ?>
+        <div class="alert alert-danger"><?php echo Session::get('error'); ?></div>
+        <?php endif; ?>
+        <?php if(Session::get('success')): ?>
+        <div class="alert alert-success"><?php echo Session::get('success'); ?></div>
+        <?php endif; ?>
+        <input type="text" name="email" placeholder="Email" value="<?php echo Input::old('email'); ?>" required >
+        <input type="password" name="password" placeholder="Password" required>
+      </div >
+      <input type="submit" value="Login" >
+<br><br><p style="color: #fff;">* Don't want to sign up? <a href = "javascript:void(0)" onclick = "document.getElementById('light').style.display='block';document.getElementById('fade').style.display='block'">Try a Demo Account</a></p>
+        <div id="light" class="white_content">If you dont want to sign up (left bottom corner) for a personal account, you can use a demo account: <br><br>Username: <br><b>user@tumblrclone.net</b><br>Password:<br><b>demo1234</b> 
+<br><br>* This information box appears only in our demo website. <br><br>
+<a href = "javascript:void(0)" onclick = "document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'"><u>Close this box [X]</u></a></div>
+
+    </form >
+  </div >
+
+  <div class="left-footer" >
+    <a href="<?php echo URL::to('register'); ?>" class="transparent button" > Sign Up </a >
+  </div >
+
+
+  <nav class="right-footer" >
+    <ul class="menu" >
+      <li ><a href="<?php echo URL::to('terms'); ?>" > Terms </a ></li >
+      <li ><a href="<?php echo URL::to('privacy'); ?>" > Privacy </a ></li >
+    </ul >
+  </nav >
+</div >
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layout', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

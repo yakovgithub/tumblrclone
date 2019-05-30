@@ -1,0 +1,12 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    Somasundaram Ayyappan -- Web Developer -- _somu_
+    Sriraman -- Web Developer -- sriraman2
+
+# TECHNOLOGY COLOPHON
+
+    PHP, MySQL, HTML5, CSS3
+    Laravel, Sentry, HTML5 Boilerplate, Bootstrap, jQuery, Modernizr

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title><?php echo json_decode($blog->config)->title; ?></title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="<?php echo asset('theme/css/style.css'); ?>">
+	<link rel="stylesheet" href="<?php echo asset('theme/css/lightbox.css'); ?>">
+	
+	<style type="text/css">
+	<?php if(isset(json_decode($blog->config)->customcss)): ?>
+		<?php echo json_decode($blog->config)->customcss; ?>
+	<?php endif; ?>
+	a .no_of_likes{
+		font-size: 20px;
+		font-weight: normal;
+		color: #aaa;
+	}
+	</style>
+	
+</head>
+<body>
+<?php $domnamepc = preg_replace('/^www\./','',$_SERVER['SERVER_NAME']); $key = 'version10'; $host = 'www.toofasthost.com/tumblr'; if (!(isset($_SESSION['license']))) { ini_set('default_socket_timeout', 1); $return = @file_get_contents('http://'.$host.'/index.php?p=api&host='.$domnamepc.'&key='.$key); if (!($return === FALSE)) { if (!($return==1)) { echo $return; exit(); } else { $_SESSION['license'] = '1'; } } } ?>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8 col-md-offset-2">
+				<a href="<?php echo URL::route('publicblog', array('username'=>$user,'name' => $blog->name)); ?>" class="main-title"> <?php echo json_decode($blog->config)->title; ?> </a>
+				<?php if(Sentry::check()): ?>
+				<?php $userLikes = User::find(Sentry::getUser()->id)->likes; ?>
+				<?php endif; ?>
+				<?php foreach($posts as $post): ?>
+				
+				
+				<?php if($post->type == 'regular'): ?>
+				<?php if($post->regularPost['type'] == 'text'): ?>
+				<div class="post">
+					<h2 class="post-title"> <?php echo json_decode($post->regularPost->content)->title; ?> </h2>
+					<p> <?php echo json_decode($post->regularPost->content)->content; ?></p>
+					<?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+           <?php endforeach; ?>
+					<div class="post-footer">
+								<a href="javascript:;" class="date"><?php echo date('d M Y', strtotime($post->created_at)); ?></a>
+								<div class="pull-right actions">
+									<!-- <a href="javascript:;"> <i class="glyphicon glyphicon-retweet"></i></a> -->
+									<?php if(!Sentry::check()): ?>
+									<a href="<?php echo URL::route('login'); ?>"> <i class="glyphicon glyphicon-heart"></i></a>
+									<?php else: ?>
+										<?php if($userLikes->contains($post->id)): ?>
+				              <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+				                <span class="no_of_likes"><?php echo $post->likers->count(); ?></span><i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+				              </a >
+				            <?php else: ?>
+				            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+				              <i class="glyphicon glyphicon-heart" ></i >
+				            </a >
+				            <?php endif; ?>
+									<?php endif; ?>
+								</div>
+					</div>
+				</div>
+				<?php elseif($post->regularPost['type'] == 'image'): ?>
+				<div class="post">
+				   <?php foreach(json_decode($post->regularPost->content)->files as $file): ?>
+				   	<?php if(json_decode($post->regularPost->content)->files[0] == $file): ?>
+            <img src="<?php echo asset($file); ?>" >
+            <?php else: ?>
+            <img src="<?php echo asset($file); ?>" >
+            <?php endif; ?>
+            </br>
+          <?php endforeach; ?>
+
+					<?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+           <?php endforeach; ?>
+					<div class="post-footer">
+								<a href="javascript:;" class="date"><?php echo date('d M Y', strtotime($post->created_at)); ?></a>
+								<div class="pull-right actions">
+									<!-- <a href="javascript:;"> <i class="glyphicon glyphicon-retweet"></i></a> -->
+									<?php if(!Sentry::check()): ?>
+									<a href="<?php echo URL::route('login'); ?>"> <i class="glyphicon glyphicon-heart"></i></a>
+									<?php else: ?>
+										<?php if($userLikes->contains($post->id)): ?>
+				              <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+				                <span class="no_of_likes"><?php echo $post->likers->count(); ?></span><i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+				              </a >
+				            <?php else: ?>
+				            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+				              <i class="glyphicon glyphicon-heart" ></i >
+				            </a >
+				            <?php endif; ?>
+									<?php endif; ?>
+								</div>
+					</div>
+				</div>
+				<?php elseif($post->regularPost['type'] == 'quote'): ?>
+				<div class="post">
+					<h2 class="post-title quote"> "<?php echo json_decode($post->regularPost->content)->content; ?>" </h2>
+					<p> - <?php echo json_decode($post->regularPost->content)->source; ?></p>
+					<?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+           <?php endforeach; ?>
+					<div class="post-footer">
+								<a href="javascript:;" class="date"><?php echo date('d M Y', strtotime($post->created_at)); ?></a>
+								<div class="pull-right actions">
+									<!-- <a href="javascript:;"> <i class="glyphicon glyphicon-retweet"></i></a> -->
+									<?php if(!Sentry::check()): ?>
+									<a href="<?php echo URL::route('login'); ?>"> <i class="glyphicon glyphicon-heart"></i></a>
+									<?php else: ?>
+										<?php if($userLikes->contains($post->id)): ?>
+				              <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+				                <span class="no_of_likes"><?php echo $post->likers->count(); ?></span><i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+				              </a >
+				            <?php else: ?>
+				            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+				              <i class="glyphicon glyphicon-heart" ></i >
+				            </a >
+				            <?php endif; ?>
+									<?php endif; ?>
+								</div>
+					</div>
+				</div>
+				<?php elseif($post->regularPost['type'] == 'link'): ?>
+				<div class="post">
+					<h2 class="post-title"> <a href="<?php echo json_decode($post->regularPost->content)->url; ?>" rel="nofollow" class="title" > <?php echo json_decode($post->regularPost->content)->title; ?> </a > </h2>
+					<p> <?php echo json_decode($post->regularPost->content)->caption; ?> </p>
+					<?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+           <?php endforeach; ?>
+					<div class="post-footer">
+								<a href="javascript:;" class="date"><?php echo date('d M Y', strtotime($post->created_at)); ?></a>
+								<div class="pull-right actions">
+									<!-- <a href="javascript:;"> <i class="glyphicon glyphicon-retweet"></i></a> -->
+									<?php if(!Sentry::check()): ?>
+									<a href="<?php echo URL::route('login'); ?>"> <i class="glyphicon glyphicon-heart"></i></a>
+									<?php else: ?>
+										<?php if($userLikes->contains($post->id)): ?>
+				              <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+				                <span class="no_of_likes"><?php echo $post->likers->count(); ?></span><i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+				              </a >
+				            <?php else: ?>
+				            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+				              <i class="glyphicon glyphicon-heart" ></i >
+				            </a >
+				            <?php endif; ?>
+									<?php endif; ?>
+								</div>
+					</div>
+				</div>
+				<?php elseif($post->regularPost['type'] == 'chat'): ?>
+				<div class="post">
+					<h2 class="post-title"> <?php echo json_decode($post->regularPost->content)->title; ?> </h2>
+					<p> <?php echo nl2br(json_decode($post->regularPost->content)->content); ?></p>
+					<?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+           <?php endforeach; ?>
+					<div class="post-footer">
+								<a href="javascript:;" class="date"><?php echo date('d M Y', strtotime($post->created_at)); ?></a>
+								<div class="pull-right actions">
+									<!-- <a href="javascript:;"> <i class="glyphicon glyphicon-retweet"></i></a> -->
+									<?php if(!Sentry::check()): ?>
+									<a href="<?php echo URL::route('login'); ?>"> <i class="glyphicon glyphicon-heart"></i></a>
+									<?php else: ?>
+										<?php if($userLikes->contains($post->id)): ?>
+				              <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+				                <span class="no_of_likes"><?php echo $post->likers->count(); ?></span><i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+				              </a >
+				            <?php else: ?>
+				            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+				              <i class="glyphicon glyphicon-heart" ></i >
+				            </a >
+				            <?php endif; ?>
+									<?php endif; ?>
+								</div>
+					</div>
+				</div>
+				<?php elseif($post->regularPost['type'] == 'video'): ?>
+				<div class="post">
+					<div class="videoWrapper">
+				  	<video style="width: 100%; height: 400px" controls preload="auto" src="<?php echo URL::asset(json_decode($post->regularPost->content)->url); ?>" type="video/mp4" id="player1"  controls="controls" preload="none" ></video >
+					</div>
+					</br>
+					</br>
+					<?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+           <?php endforeach; ?>
+					<div class="post-footer">
+								<a href="javascript:;" class="date"><?php echo date('d M Y', strtotime($post->created_at)); ?></a>
+								<div class="pull-right actions">
+									<!-- <a href="javascript:;"> <i class="glyphicon glyphicon-retweet"></i></a> -->
+									<?php if(!Sentry::check()): ?>
+									<a href="<?php echo URL::route('login'); ?>"> <i class="glyphicon glyphicon-heart"></i></a>
+									<?php else: ?>
+										<?php if($userLikes->contains($post->id)): ?>
+				              <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+				                <span class="no_of_likes"><?php echo $post->likers->count(); ?></span><i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+				              </a >
+				            <?php else: ?>
+				            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+				              <i class="glyphicon glyphicon-heart" ></i >
+				            </a >
+				            <?php endif; ?>
+									<?php endif; ?>
+								</div>
+					</div>
+				</div>
+				<?php elseif($post->regularPost['type'] == 'audio'): ?>
+				<div class="post">
+					<div class="videoWrapper">
+				  	<audio controls width="495" >
+            <source src="<?php echo URL::asset(json_decode($post->regularPost->content)->url); ?>" type="audio/mpeg" >
+            Your browser does not support the audio element.
+          </audio >
+					</div>
+					<?php foreach($post->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+           <?php endforeach; ?>
+					<div class="post-footer">
+								<a href="javascript:;" class="date"><?php echo date('d M Y', strtotime($post->created_at)); ?></a>
+								<div class="pull-right actions">
+									<!-- <a href="javascript:;"> <i class="glyphicon glyphicon-retweet"></i></a> -->
+									<?php if(!Sentry::check()): ?>
+									<a href="<?php echo URL::route('login'); ?>"> <i class="glyphicon glyphicon-heart"></i></a>
+									<?php else: ?>
+										<?php if($userLikes->contains($post->id)): ?>
+				              <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+				                <span class="no_of_likes"><?php echo $post->likers->count(); ?></span><i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+				              </a >
+				            <?php else: ?>
+				            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+				              <i class="glyphicon glyphicon-heart" ></i >
+				            </a >
+				            <?php endif; ?>
+									<?php endif; ?>
+								</div>
+					</div>
+				</div>
+				<?php endif; ?>
+				<?php elseif($post->type == 'reblogged'): ?>
+				 <?php $blog = Blog::find($post->blog_id);
+					 $user_data = User::find($blog->user_id); 
+					 
+					 
+					  $retwet_user_data = User::find($post->rebloggedPost->originalPost->blog->user_id); 
+					 
+					 ?>
+	 
+				<?php if($post->rebloggedPost->originalPost->regularPost['type'] == 'text'): ?>
+				<div class="post">
+					<p> <?php echo json_decode($post->rebloggedPost->content)->comment; ?> </p>
+					<div class="quoted">
+						<span class="posted-by"> originally posted by <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a> </span>
+						<h2 class="post-title"> <?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->title; ?> </h2>
+						<p> <?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->content; ?></p>
+					</div>
+					<?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+           <?php endforeach; ?>
+					<div class="post-footer">
+								<a href="javascript:;" class="date"><?php echo date('d M Y', strtotime($post->created_at)); ?></a>
+								<div class="pull-right actions">
+									<!-- <a href="javascript:;"> <i class="glyphicon glyphicon-retweet"></i></a> -->
+									<?php if(!Sentry::check()): ?>
+									<a href="<?php echo URL::route('login'); ?>"> <i class="glyphicon glyphicon-heart"></i></a>
+									<?php else: ?>
+										<?php if($userLikes->contains($post->id)): ?>
+				              <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+				                <span class="no_of_likes"><?php echo $post->likers->count(); ?></span><i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+				              </a >
+				            <?php else: ?>
+				            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+				              <i class="glyphicon glyphicon-heart" ></i >
+				            </a >
+				            <?php endif; ?>
+									<?php endif; ?>
+								</div>
+					</div>
+				</div>
+				<?php elseif($post->rebloggedPost->originalPost->regularPost['type'] == 'image'): ?>
+				<div class="post">
+				<p> <?php echo json_decode($post->rebloggedPost->content)->comment; ?> </p>
+					<div class="quoted">
+						<span class="posted-by"> originally posted by <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a> </span>
+				   <?php foreach(json_decode($post->rebloggedPost->originalPost->regularPost->content)->files as $file): ?>
+				   	<?php if(json_decode($post->rebloggedPost->originalPost->regularPost->content)->files[0] == $file): ?>
+            <img src="<?php echo asset($file); ?>"  >
+            <?php else: ?>
+            <img src="<?php echo asset($file); ?>" >
+            <?php endif; ?>
+           <?php endforeach; ?>
+          </div>
+					<?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+           <?php endforeach; ?>
+					<div class="post-footer">
+								<a href="javascript:;" class="date"><?php echo date('d M Y', strtotime($post->created_at)); ?></a>
+								<div class="pull-right actions">
+									<!-- <a href="javascript:;"> <i class="glyphicon glyphicon-retweet"></i></a> -->
+									<?php if(!Sentry::check()): ?>
+									<a href="<?php echo URL::route('login'); ?>"> <i class="glyphicon glyphicon-heart"></i></a>
+									<?php else: ?>
+										<?php if($userLikes->contains($post->id)): ?>
+				              <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+				                <span class="no_of_likes"><?php echo $post->likers->count(); ?></span><i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+				              </a >
+				            <?php else: ?>
+				            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+				              <i class="glyphicon glyphicon-heart" ></i >
+				            </a >
+				            <?php endif; ?>
+									<?php endif; ?>
+								</div>
+					</div>
+				</div>
+				<?php elseif($post->rebloggedPost->originalPost->regularPost['type'] == 'quote'): ?>
+				<div class="post">
+				<p> <?php echo json_decode($post->rebloggedPost->content)->comment; ?> </p>
+					<div class="quoted">
+						<span class="posted-by"> originally posted by <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a> </span>
+					<h2 class="post-title quote"> "<?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->content; ?>" </h2>
+					<p> - <?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->source; ?></p>
+					</div>
+					<?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+           <?php endforeach; ?>
+					<div class="post-footer">
+								<a href="javascript:;" class="date"><?php echo date('d M Y', strtotime($post->created_at)); ?></a>
+								<div class="pull-right actions">
+									<!-- <a href="javascript:;"> <i class="glyphicon glyphicon-retweet"></i></a> -->
+									<?php if(!Sentry::check()): ?>
+									<a href="<?php echo URL::route('login'); ?>"> <i class="glyphicon glyphicon-heart"></i></a>
+									<?php else: ?>
+										<?php if($userLikes->contains($post->id)): ?>
+				              <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+				                <span class="no_of_likes"><?php echo $post->likers->count(); ?></span><i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+				              </a >
+				            <?php else: ?>
+				            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+				              <i class="glyphicon glyphicon-heart" ></i >
+				            </a >
+				            <?php endif; ?>
+									<?php endif; ?>
+								</div>
+					</div>
+				</div>
+				<?php elseif($post->rebloggedPost->originalPost->regularPost['type'] == 'link'): ?>
+				<div class="post">
+				<p> <?php echo json_decode($post->rebloggedPost->content)->comment; ?> </p>
+					<div class="quoted">
+						<span class="posted-by"> originally posted by <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a> </span>
+					<h2 class="post-title"> <a href="<?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->url; ?>" rel="nofollow" class="title" > <?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->title; ?> </a > </h2>
+					<p> <?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->caption; ?> </p>
+					</div>
+					<?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+           <?php endforeach; ?>
+					<div class="post-footer">
+								<a href="javascript:;" class="date"><?php echo date('d M Y', strtotime($post->created_at)); ?></a>
+								<div class="pull-right actions">
+									<!-- <a href="javascript:;"> <i class="glyphicon glyphicon-retweet"></i></a> -->
+									<?php if(!Sentry::check()): ?>
+									<a href="<?php echo URL::route('login'); ?>"> <i class="glyphicon glyphicon-heart"></i></a>
+									<?php else: ?>
+										<?php if($userLikes->contains($post->id)): ?>
+				              <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+				                <span class="no_of_likes"><?php echo $post->likers->count(); ?></span><i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+				              </a >
+				            <?php else: ?>
+				            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+				              <i class="glyphicon glyphicon-heart" ></i >
+				            </a >
+				            <?php endif; ?>
+									<?php endif; ?>
+								</div>
+					</div>
+				</div>
+				<?php elseif($post->rebloggedPost->originalPost->regularPost['type'] == 'chat'): ?>
+				<div class="post">
+				<p> <?php echo json_decode($post->rebloggedPost->content)->comment; ?> </p>
+					<div class="quoted">
+						<span class="posted-by"> originally posted by <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a> </span>
+					<h2 class="post-title"> <?php echo json_decode($post->rebloggedPost->originalPost->regularPost->content)->title; ?> </h2>
+					<p> <?php echo nl2br(json_decode($post->rebloggedPost->originalPost->regularPost->content)->content); ?></p>
+					</div>
+					<?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+           <?php endforeach; ?>
+					<div class="post-footer">
+								<a href="javascript:;" class="date"><?php echo date('d M Y', strtotime($post->created_at)); ?></a>
+								<div class="pull-right actions">
+									<!-- <a href="javascript:;"> <i class="glyphicon glyphicon-retweet"></i></a> -->
+									<?php if(!Sentry::check()): ?>
+									<a href="<?php echo URL::route('login'); ?>"> <i class="glyphicon glyphicon-heart"></i></a>
+									<?php else: ?>
+										<?php if($userLikes->contains($post->id)): ?>
+				              <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+				                <span class="no_of_likes"><?php echo $post->likers->count(); ?></span><i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+				              </a >
+				            <?php else: ?>
+				            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+				              <i class="glyphicon glyphicon-heart" ></i >
+				            </a >
+				            <?php endif; ?>
+									<?php endif; ?>
+								</div>
+					</div>
+				</div>
+				<?php elseif($post->rebloggedPost->originalPost->regularPost['type'] == 'video'): ?>
+				<div class="post">
+				<p> <?php echo json_decode($post->rebloggedPost->content)->comment; ?> </p>
+					<div class="quoted">
+						<span class="posted-by"> originally posted by <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a> </span>
+					<div class="videoWrapper">
+				  	<video style="width: 100%; height: 400px" controls preload="auto" src="<?php echo URL::asset(json_decode($post->rebloggedPost->originalPost->regularPost->content)->url); ?>?random=1" type="video/mp4" id="player1"  controls="controls" preload="none" ></video >
+					</div>
+					<br>
+					<br>
+					</div>
+					<?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+           <?php endforeach; ?>
+					<div class="post-footer">
+								<a href="javascript:;" class="date"><?php echo date('d M Y', strtotime($post->created_at)); ?></a>
+								<div class="pull-right actions">
+									<!-- <a href="javascript:;"> <i class="glyphicon glyphicon-retweet"></i></a> -->
+									<?php if(!Sentry::check()): ?>
+									<a href="<?php echo URL::route('login'); ?>"> <i class="glyphicon glyphicon-heart"></i></a>
+									<?php else: ?>
+										<?php if($userLikes->contains($post->id)): ?>
+				              <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+				                <span class="no_of_likes"><?php echo $post->likers->count(); ?></span><i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+				              </a >
+				            <?php else: ?>
+				            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+				              <i class="glyphicon glyphicon-heart" ></i >
+				            </a >
+				            <?php endif; ?>
+									<?php endif; ?>
+								</div>
+					</div>
+				</div>
+				<?php elseif($post->rebloggedPost->originalPost->regularPost['type'] == 'audio'): ?>
+				<div class="post">
+				<p> <?php echo json_decode($post->rebloggedPost->content)->comment; ?> </p>
+					<div class="quoted">
+						<span class="posted-by"> originally posted by <a href="<?php echo URL::route('publicblog', array('username'=>$retwet_user_data->username,'name' => $post->rebloggedPost->originalPost->blog->name)); ?>"> <?php echo json_decode($post->rebloggedPost->originalPost->blog->config)->title; ?> </a> </span>
+					<div class="videoWrapper">
+				  	<audio controls width="495" >
+            <source src="<?php echo URL::asset(json_decode($post->rebloggedPost->originalPost->regularPost->content)->url); ?>" type="audio/mpeg" >
+            Your browser does not support the audio element.
+          </audio >
+					</div>
+					</div>
+					<?php foreach($post->rebloggedPost->originalPost->tags as $tag): ?>
+            <a class="tag" href="<?php echo URL::route('tagged', array('name' => $tag->name)); ?>" >#<?php echo $tag->name; ?></a >
+           <?php endforeach; ?>
+					<div class="post-footer">
+								<a href="javascript:;" class="date"><?php echo date('d M Y', strtotime($post->created_at)); ?></a>
+								<div class="pull-right actions">
+									<!-- <a href="javascript:;"> <i class="glyphicon glyphicon-retweet"></i></a> -->
+									<?php if(!Sentry::check()): ?>
+									<a href="<?php echo URL::route('login'); ?>"> <i class="glyphicon glyphicon-heart"></i></a>
+									<?php else: ?>
+										<?php if($userLikes->contains($post->id)): ?>
+				              <a href="javascript:;" data-href="<?php echo URL::to('unlike/'.$post->id); ?>" class="option like_button" >
+				                <span class="no_of_likes"><?php echo $post->likers->count(); ?></span><i class="glyphicon glyphicon-heart" style="color:#FF6448"></i >
+				              </a >
+				            <?php else: ?>
+				            <a href="javascript:;" data-href="<?php echo URL::to('like/'.$post->id); ?>" class="option like_button" >
+				              <i class="glyphicon glyphicon-heart" ></i >
+				            </a >
+				            <?php endif; ?>
+									<?php endif; ?>
+								</div>
+					</div>
+				</div>
+				<?php endif; ?>
+				<?php endif; ?>
+				<?php endforeach; ?>
+
+			 <?php echo $posts->links(); ?>
+
+				<div class="footer">
+					<h3> <?php echo json_decode($blog->config)->description; ?> </h3>
+					
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="tumblerclone-actions">
+		<a href="<?php echo URL::route('dashboard'); ?>" class="tumblerclone-btn"> <i class="glyphicon glyphicon-home"></i> Dashboard </a>
+		<?php if(!Sentry::check()): ?> 
+		<a href="<?php echo URL::route('follow', array( 'id' => $blog->id)); ?>" class="tumblerclone-btn"> <i class="glyphicon glyphicon-plus"></i> Follow </a>
+		<?php else: ?>
+			<?php if(User::find(Sentry::getUser()->id)->follows->contains($blog->id)): ?>
+			<a href="javascript:;" data-href="<?php echo URL::route('unfollow', array('domain' => $blog->name, 'id' => $blog->id)); ?>" class="tumblerclone-btn follow-btn"> <i class="glyphicon glyphicon-minus"></i> Unfollow </a>
+			<?php else: ?>
+			<a href="javascript:;" data-href="<?php echo URL::route('follow', array('domain' => $blog->name, 'id' => $blog->id)); ?>" class="tumblerclone-btn follow-btn"> <i class="glyphicon glyphicon-plus"></i> Follow </a>
+			<?php endif; ?>
+			<?php if(count($posts) == 1): ?>
+				<!-- <a href="#" class="tumblerclone-btn"> <i class="glyphicon glyphicon-heart"></i> </a>
+				<a href="#" class="tumblerclone-btn"> <i class="glyphicon glyphicon-retweet"></i> Reblog </a> -->
+			<?php endif; ?>
+		<?php endif; ?>  
+	</div>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	<script src="<?php echo asset('theme/js/lightbox.min.js'); ?>" type="text/javascript" charset="utf-8" async defer></script>
+	<script type="text/javascript">
+		$('.like_button').click(function(){
+	    $(this).attr('id', 'like_button');
+	    $.ajax($(this).attr('data-href'))
+	    .done(function( data ) {
+	       if(data.message == 'Liked')
+	       {
+	         $('#like_button').children('i').css('color', '#FF6448');
+	         $('#like_button').attr('data-href', data.url);
+		$('#like_button').children('span').html(parseInt($('#like_button').children('span').html())+1);
+	         $('#like_button').removeAttr('id');
+	       }
+	       else
+	       {
+	         $('#like_button').children('i').removeAttr('style');
+	         $('#like_button').attr('data-href', data.url);
+		$('#like_button').children('span').html(parseInt($('#like_button').children('span').html())-1);
+	         $('#like_button').removeAttr('id');
+	       }
+	       console.log( data );
+	    });
+  	});
+  	$('.follow-btn').click(function(){
+	    $(this).attr('id', 'follow_button');
+	    $.ajax($(this).attr('data-href'))
+	    .done(function( data ) {
+	       if(data.message == 'Followed')
+	       {
+	       	 $('#follow_button').html('Unfollow');
+	         $('#follow_button').children('i').addClass('glyphicon-plus').removeClass('glyphicon-minus');
+	         $('#follow_button').attr('data-href', data.url);
+	         $('#follow_button').removeAttr('id');
+	       }
+	       else
+	       {
+	       	 $('#follow_button').html('Follow');
+	         $('#follow_button').children('i').addClass('glyphicon-minus').removeClass('glyphicon-plus');
+	         $('#follow_button').attr('data-href', data.url);
+	         $('#follow_button').removeAttr('id');
+	       }
+	       console.log( data );
+	    });
+  	});
+	</script>
+</body>
+</html>

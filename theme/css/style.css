@@ -1,0 +1,163 @@
+body{
+	font-family : 'Open Sans', sans-serif;
+	background-color: #f5f5f5;
+}
+
+a.main-title{
+	text-align: center;
+	font-size: 24px;
+	color: #454545;
+	text-decoration: none;
+	display: block;
+	font-weight: 400;
+	margin-top: 45px;
+	margin-bottom: 35px;
+}
+
+a.main-title:hover{
+	text-decoration: none;
+	color: #7f8394;
+}
+
+.post{
+	background-color: #fff;
+	padding: 40px;
+	margin-bottom: 20px;
+}
+
+.post img{
+	max-width: 100%;
+}
+
+.post p{
+	word-wrap: break-word;
+}
+
+
+img.big-image{
+	width: 100%;
+}
+
+a.post-title{
+	margin-top: 30px;
+	margin-bottom: 22px;
+	font-size: 22px;
+	color: #454545;
+	text-decoration: none;
+}
+
+.post > p{
+	padding-top: 10px;
+	font-weight: 300;
+	font-size: 16px;
+	line-height: 1.8;
+}
+
+a.tag{
+	display: inline-block;
+	padding-right: 10px;
+	text-transform: uppercase;
+	color: #d5d5d5;
+	text-decoration: none;
+}
+
+a.tag:hover{
+	color: #454545;
+}
+
+.post-footer{
+	margin-top: 15px;
+	text-transform: uppercase;
+}
+
+.post-footer a{
+	color: #d5d5d5;
+	text-decoration: none;
+}
+
+.post-footer a:hover{
+	color: #454545;
+}
+
+.post-footer .actions{
+	font-size: 18px;
+	margin-top: -10px;
+}
+
+.post-footer .glyphicon-heart.active{
+	color: #ff6347;
+}
+
+.post-footer .glyphicon-retweet.active{
+	color: #27ae60;
+}
+
+.videoWrapper {
+	position: relative;
+	padding-bottom: 56.25%; /* 16:9 */
+	padding-top: 25px;
+	height: 0;
+}
+.videoWrapper iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.footer{
+	margin-top: 102px;
+	margin-bottom: 79px;
+}
+
+.footer h3{
+	text-align: center;
+	font-size: 20px;
+}
+
+.footer h5{
+	font-size: 14px;
+	text-align: center;
+	font-weight: 100;
+}
+
+.tumblerclone-actions{
+	position: fixed;
+	right: 2px;
+	top: 4px;
+}
+
+a.tumblerclone-btn{
+	padding: 4px;
+	color: #fff;
+	background-color: rgba(0,0,0,0.5);
+	border-radius: 3px;
+	font-size: 12px;
+	margin-left: 5px;
+}
+
+a.tumblerclone-btn i{
+	font-size: 10px;
+}
+
+.quoted{
+	padding-left: 10px;
+	border-left: 5px solid #454545;
+}
+
+span.posted-by{
+	color: #999;
+	display: block;
+}
+
+a .no_of_likes{
+	text-decoration: none;
+	color: #999;
+	font-size: 26px;
+	font-weight: bold;
+}
+
+a .no_of_likes:hover{
+	text-decoration: none;
+}
